@@ -1,0 +1,28 @@
+.github/workflows/build.yml
+name: Build PulseDeck
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --target PulseDeck_VST3 PulseDeck_Standalone
+
+      - name: Upload plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: PulseDeck-${{ matrix.os }}
+          path: build/PulseDeck_artefacts
